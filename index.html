@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sudoku Solver</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="sudoku-container">
+  <!-- Sudoku Grid -->
+  <div class="sudoku-grid" id="sudokuGrid">
+    <!-- 81 Input-Felder für das Sudoku -->
+     <script>
+        let activeCell = null;
+
+        // Funktion zur Eingabe der Zahl über Buttons
+        function inputNumber(num) {
+        if (activeCell) {
+            document.getElementById(activeCell).textContent = num;
+            console.log(activeCell.value);
+            document.getElementById(activeCell).classList.add("user-input");
+        }
+        }
+
+        // Solve Funktion (Platzhalter)
+        function solveSudoku() {
+        alert("Die Sudoku-Lösung wird hier implementiert.");
+        }
+
+        function change_selected_square(current_square){
+            activeCell = 'button'+current_square;
+            console.log(activeCell);
+        }
+
+        // Use JavaScript to generate the grid structure for brevity
+        for (let i = 0; i < 81; i++) {
+        document.write('<button id="button'+String(i)+'"type="text" onclick=\'change_selected_square(' + i +');\' class="cell" maxlength="1">-</button>');
+        }
+      </script>
+    <!-- Fügen Sie insgesamt 81 Eingabefelder hinzu -->
+  </div>
+
+  <!-- Buttons zur Eingabe von Zahlen 1-9 -->
+  <div class="number-buttons">
+    <button class="num-btn" onclick="inputNumber('-')">-</button>
+    <script>
+        for (let i = 0; i <= 9; i++) {
+        document.write('<button class="num-btn" onclick="inputNumber('+i+')">'+i+'</button>');
+        }
+    </script>
+  </div>
+
+  <!-- Solve Button -->
+  <button class="solve-btn" onclick="solveSudoku()">Solve</button>
+</div>
+</body>
+</html>

@@ -1,0 +1,112 @@
+/* Grundlegende Einstellungen für Dark Mode */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #121212;
+    color: #e0e0e0;
+  }
+  
+  .sudoku-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+/* Stil für das Sudoku-Raster */
+.sudoku-grid {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);  /* 9 columns of equal width */
+  grid-template-rows: repeat(9, 1fr);     /* 9 rows of equal height */
+  grid-gap: 2px;                          /* Small gap between all cells */
+  width: 360px;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+/* Border for individual cells */
+.sudoku-grid > .cell {
+  border: 1px solid #ccc;  /* Default border for cells */
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  font-size: 20px;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+/* Add thicker borders between 3x3 blocks */
+.sudoku-grid > .cell:nth-child(9n + 5) {
+    border-left: 5px solid black;  /* Thicker left border for every 3rd row */
+  }
+
+.sudoku-grid > .cell:nth-child(9n + 8) {
+    border-left: 5px solid black;  /* Thicker left border for every 3rd row */
+  }
+
+.sudoku-grid > .cell:nth-child(n+20):nth-child(-n+28) {
+    border-bottom: 5px solid black;  /* Thicker bottom border for every 3x3 block row */
+  }
+
+.sudoku-grid > .cell:nth-child(n+47):nth-child(-n+55) {
+    border-bottom: 5px solid black;  /* Thicker bottom border for every 3x3 block row */
+  }
+   
+  .cell {
+    width: 100%;
+    padding: 20px;
+    text-align: center;
+    font-size: 1.5em;
+    background-color: #333;
+    color: #e0e0e0;
+    border: 1px solid #555;
+    outline: none;
+    box-sizing: border-box;
+  }
+  
+  /* Original und Benutzer-Eingabefelder unterscheiden */
+  .cell.original {
+    color: #4caf50;
+  }
+  
+  .cell.user-input {
+    color: #ff5722;
+  }
+  
+  /* Stil für die Nummern-Buttons */
+  .number-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .num-btn, .solve-btn {
+    padding: 10px 20px;
+    font-size: 1em;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  
+  .num-btn {
+    background-color: #444;
+    color: #e0e0e0;
+  }
+  
+  .num-btn:hover {
+    background-color: #555;
+  }
+  
+  /* Stil für den Solve-Button */
+  .solve-btn {
+    background-color: #00796b;
+    color: #e0e0e0;
+  }
+  
+  .solve-btn:hover {
+    background-color: #009688;
+  }
+  
