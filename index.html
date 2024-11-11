@@ -13,27 +13,6 @@
   <div class="sudoku-grid" id="sudokuGrid">
     <!-- 81 Input-Felder für das Sudoku -->
      <script>
-        let activeCell = null;
-
-        // Funktion zur Eingabe der Zahl über Buttons
-        function inputNumber(num) {
-        if (activeCell) {
-            document.getElementById(activeCell).textContent = num;
-            console.log(activeCell.value);
-            document.getElementById(activeCell).classList.add("user-input");
-        }
-        }
-
-        // Solve Funktion (Platzhalter)
-        function solveSudoku() {
-        alert("Die Sudoku-Lösung wird hier implementiert.");
-        }
-
-        function change_selected_square(current_square){
-            activeCell = 'button'+current_square;
-            console.log(activeCell);
-        }
-
         // Use JavaScript to generate the grid structure for brevity
         for (let i = 0; i < 81; i++) {
         document.write('<button id="button'+String(i)+'"type="text" onclick=\'change_selected_square(' + i +');\' class="cell" maxlength="1">-</button>');
@@ -41,12 +20,11 @@
       </script>
     <!-- Fügen Sie insgesamt 81 Eingabefelder hinzu -->
   </div>
-
   <!-- Buttons zur Eingabe von Zahlen 1-9 -->
   <div class="number-buttons">
     <button class="num-btn" onclick="inputNumber('-')">-</button>
     <script>
-        for (let i = 0; i <= 9; i++) {
+        for (let i = 1; i <= 9; i++) {
         document.write('<button class="num-btn" onclick="inputNumber('+i+')">'+i+'</button>');
         }
     </script>
@@ -55,5 +33,208 @@
   <!-- Solve Button -->
   <button class="solve-btn" onclick="solveSudoku()">Solve</button>
 </div>
+
+
+
+
+
+<script>
+  let activeCell = null;
+  let sudokuGrid = [];
+  sudokuGrid = create_sudoku_grid();
+
+  function create_sudoku_grid(){
+    /*Creates the Sudoku grid on website startup */
+    // Create 9 rows
+    let sudokuGrid = [];
+    for (let i = 0; i < 9; i++) {
+      let row = []; 
+      // Populate the row with 9 columns (each initialized to 0)
+      for (let j = 0; j < 9; j++) {
+        row.push(0);
+      }
+        sudokuGrid.push(row);
+      }
+      return sudokuGrid;
+    }
+
+  // Funktion zur Eingabe der Zahl über Buttons
+  function inputNumber(num) {
+    /* Inputs the number from the currently selected square into the button and into the Array
+    Inputs:
+    num: int: The number of the currently selected button
+    Return: None
+    */
+    //Check if any cell has been selected at all
+    if (activeCell) {
+        document.getElementById(activeCell).textContent = num;
+        //Adds the button to the user-input list, when the user has input anything besides the erase "-"
+        if (num != "-"){
+          document.getElementById(activeCell).classList.add("user-input");
+        }
+        //Removes element from user-inpput list when being erased by putting in a "-"
+        else{
+          document.getElementById(activeCell).classList.remove("user-input");
+        }
+        //Get the number of the currently selected button
+        let n = activeCell.replace("button", "");
+        n = parseInt(n, 10);
+        //Calculate the current row and column, to input the number into the array
+        let row = Math.floor(n / 9);
+        let col = n % 9;
+        sudokuGrid[row][col] = num;
+        //Check if the input is valid
+        check_sudoku_isvalid(n);
+    }
+  }
+
+  function change_selected_square(current_square){
+    /*Changes the active cell, used on button press */
+      activeCell = 'button'+current_square;
+  }
+
+  //Function under Development-------------------------------------------------------------------
+  function solveSudoku(){
+    console.log(sudokuGrid);
+    let current_row = 0;
+    let current_column = 0;
+    let last_action = ""
+
+    while (current_row<9)
+    if (!current_cell.classList.contains("user-input")){
+      sudokuGrid[current_row][current_column] +=1
+    }
+    current_cell = document.getElementById(activeCell)
+
+    if (check_sudoku_isvalid() || (current_cell.classList.contains("user-input") && last_action == "forwards")){
+      if (current_column = 8){
+        current_column = 0;
+        current_row +=1;
+        last_action = "forwards"
+      }
+      else{
+        current_column +=1;
+        last_action = "forwards"
+      }
+    }
+    else if (sudokuGrid[current_row][current_column] = 9 || (current_cell.classList.contains("user-input") && last_action == "backwards")){
+      sudokuGrid[current_row][current_column] = 0
+      if (current_column = 0){
+        current_column = 0;
+        current_row -=1;
+        last_action = "backwards"
+      }
+      else{
+        current_column -=1;
+        last_action = "backwards"
+      }
+    }
+  }
+//-----------------------------------------------------------------------------------------------
+
+  function check_sudoku_isvalid(i){
+    /**
+     * Checks if the newly added number makes the sudoku invalid
+     * Inputs:
+     * i:int: The number of the square that has been changed
+     * Return: bool: Is the Sudoku currently valid
+     */
+    let row_valid = false;
+    let column_valid = false;
+    let square_valid = false;
+    // Calculate the row using floor division
+    row = Math.floor((i+1) / 9);
+    // Calculate the column using rows
+    column = i - (9*row)
+
+    //Check all conditions for the sudoku to be legal
+    row_valid = check_row_isvalid(row);
+    column_valid = check_column_isvalid(column);
+    square_valid = check_square_isvalid(row, column);
+
+    function check_row_isvalid(row){
+      /*
+      Create a new Empty set. Iterate through the row. 
+      If the element is 0 it skips, as the square is currently empty.
+      If the element is already in the list, it means the row contains it twice, making therow invalid
+      If the element is not in the list, it is added to it
+      */
+      const seen = new Set();
+      for (let num of sudokuGrid[row]){
+        if (num !== 0){
+          if (seen.has(num)){
+            console.log("Row is invalid")
+            return false;
+          }
+          seen.add(num);
+        }
+      }
+      console.log("Row is valid")
+      return true;
+    }
+    
+    function check_column_isvalid(column){
+      /*
+      Create a new Empty set. Iterate through the column. 
+      If the element is 0 it skips, as the square is currently empty.
+      If the element is already in the list, it means the row contains it twice, making the column invalid
+      If the element is not in the list, it is added to it
+      */
+      const seen = new Set();
+      for (let row = 0; row < 9; row++){
+        const num = sudokuGrid[row][column];
+        if (num !== 0){
+          if (seen.has(num)){
+            console.log("Column is invalid");
+            return false;
+          }
+          seen.add(num);
+       }
+      }
+      console.log("Column is valid");
+      return true;
+    }
+
+    function check_square_isvalid(row, column){
+            /*
+      Create a new Empty set. Iterate through the columns and rows of the square.
+      If the element is 0 it skips, as the square is currently empty.
+      If the element is already in the list, it means the square contains it twice, making the square invalid
+      If the element is not in the list, it is added to it
+      */
+      // Set the left-right offset of the square, 0 being the one on the left, 2 the one on the right
+      const column_lr = Math.floor(column / 3);
+      // Set the top-bottom offset of the square, 0 being the one on the top, 2 the one on the bottom
+      const row_tb = Math.floor(row / 3)
+      console.log(column_lr, row_tb)
+      const seen = new Set();
+      for (let row = (row_tb*3);row < ((row_tb+1)*3);row++){
+        console.log("rows");
+        for (let column = (column_lr*3);column < ((column_lr+1)*3);column++){
+          const num = sudokuGrid[row][column];
+          console.log(num);
+          if (num !== 0){
+            if (seen.has(num)){
+              console.log("Square is invalid");
+              return false;
+            }
+            seen.add(num);
+          }
+        }
+      }
+    console.log("Square is valid");
+    return true;
+    }
+
+    // Check if all the conditions are met
+    if (row_valid && column_valid && square_valid){
+      console.log("Sudoku is valid");
+      return true;
+    }
+    console.log("Sudoku is invalid");
+    return false;
+  }
+
+</script>
 </body>
 </html>
