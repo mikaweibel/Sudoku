@@ -93,44 +93,109 @@
       activeCell = 'button'+current_square;
   }
 
-  //Function under Development-------------------------------------------------------------------
   function solveSudoku(){
-    console.log(sudokuGrid);
+    /*
+    Solves the Sudoku with a backtracking Algorithm. (Depth First)
+      1. 2 Subfunctions, one for going one cell forward, one for going one cell backwards
+      2. Start at the first fiel which is not a user input
+      3. Add 1 to the field. If the Cell has a valid number in it (x<=9), calculate if the sudoku is valid
+        3.1 If the sudoku is valid, advance one cell
+        3.2 If the sudoku is invalid, increment the number by one
+      4. If the Cell input is bigger than 9 it means that all numbers have been tried and there is no possible solution
+        4.1 As there is no possible solution in this branch, there must still be a mistake in a previous cell
+        4.2 Set cell back to 0
+        4.3 Go back one cell
+
+    Inputs: None
+    Return: None
+    */
     let current_row = 0;
     let current_column = 0;
-    let last_action = ""
+    let current_field = 0;
+    let last_action = "";
 
-    while (current_row<9)
-    if (!current_cell.classList.contains("user-input")){
-      sudokuGrid[current_row][current_column] +=1
-    }
-    current_cell = document.getElementById(activeCell)
-
-    if (check_sudoku_isvalid() || (current_cell.classList.contains("user-input") && last_action == "forwards")){
-      if (current_column = 8){
+    function forward(current_row, current_column, current_field){
+      /*
+      Gives the row and column of the next square
+      Inputs:
+      current_row: int: The old row
+      current_column: int: The old column
+      Return:
+      current_row: int: The new row
+      current_column: int: The new column
+      */
+      if (current_column > 7){
         current_column = 0;
-        current_row +=1;
-        last_action = "forwards"
+        current_row += 1;
       }
       else{
         current_column +=1;
-        last_action = "forwards"
       }
+      current_field += 1
+      return [current_row, current_column, current_field];
     }
-    else if (sudokuGrid[current_row][current_column] = 9 || (current_cell.classList.contains("user-input") && last_action == "backwards")){
-      sudokuGrid[current_row][current_column] = 0
-      if (current_column = 0){
-        current_column = 0;
-        current_row -=1;
-        last_action = "backwards"
+
+    function backward(current_row, current_column, current_field){
+      /*
+      Gives the row and column of the square one back
+      Inputs:
+      current_row: int: The old row
+      current_column: int: The old column
+      Return:
+      current_row: int: The new row
+      current_column: int: The new column
+      */
+      if (current_column == 0){
+        current_column = 8;
+        current_row -= 1;
       }
       else{
         current_column -=1;
-        last_action = "backwards"
+      }
+      current_field -= 1
+      return [current_row, current_column, current_field];
+    }
+
+    //Start at the first field which is not a user input
+    while (current_field <= 80){
+      if (document.getElementById("button"+String(current_field)).classList.contains("user-input")){
+        [current_row, current_column, current_field] = forward(current_row, current_column, current_field)
+      }
+      else{
+        break;
+      }
+    }
+
+    let counter = 0
+    //Repeats step until soduko is done
+    while (counter <100000){
+      const current_button = document.getElementById("button"+String(current_field));
+      sudokuGrid[current_row][current_column] +=1;
+      if (sudokuGrid[current_row][current_column] <10){
+        document.getElementById("button"+String(current_field)).textContent = String(sudokuGrid[current_row][current_column]);
+        if (check_sudoku_isvalid(current_field)){
+          [current_row, current_column, current_field] = forward(current_row, current_column, current_field);
+          while (document.getElementById("button"+String(current_field)).classList.contains("user-input")){
+            [current_row, current_column, current_field] = forward(current_row, current_column, current_field);
+          }
+        }
+      }
+      else{
+        //If the current field is explored to the max reset 
+        sudokuGrid[current_row][current_column] = 0;
+        document.getElementById("button"+String(current_field)).textContent = String(sudokuGrid[current_row][current_column]);
+        [current_row, current_column, current_field] = backward(current_row, current_column, current_field);
+        while (document.getElementById("button"+String(current_field)).classList.contains("user-input")){
+            [current_row, current_column, current_field] = backward(current_row, current_column, current_field);
+          }
+      }
+      if (current_field == 81){
+        if(check_sudoku_isvalid(current_field)){
+          break;
+        }
       }
     }
   }
-//-----------------------------------------------------------------------------------------------
 
   function check_sudoku_isvalid(i){
     /**
@@ -142,10 +207,11 @@
     let row_valid = false;
     let column_valid = false;
     let square_valid = false;
+
     // Calculate the row using floor division
-    row = Math.floor((i+1) / 9);
+    row = Math.floor(i / 9);
     // Calculate the column using rows
-    column = i - (9*row)
+    column = i % 9;
 
     //Check all conditions for the sudoku to be legal
     row_valid = check_row_isvalid(row);
@@ -163,13 +229,11 @@
       for (let num of sudokuGrid[row]){
         if (num !== 0){
           if (seen.has(num)){
-            console.log("Row is invalid")
             return false;
           }
           seen.add(num);
         }
       }
-      console.log("Row is valid")
       return true;
     }
     
@@ -185,13 +249,11 @@
         const num = sudokuGrid[row][column];
         if (num !== 0){
           if (seen.has(num)){
-            console.log("Column is invalid");
             return false;
           }
           seen.add(num);
        }
       }
-      console.log("Column is valid");
       return true;
     }
 
@@ -206,32 +268,25 @@
       const column_lr = Math.floor(column / 3);
       // Set the top-bottom offset of the square, 0 being the one on the top, 2 the one on the bottom
       const row_tb = Math.floor(row / 3)
-      console.log(column_lr, row_tb)
       const seen = new Set();
       for (let row = (row_tb*3);row < ((row_tb+1)*3);row++){
-        console.log("rows");
         for (let column = (column_lr*3);column < ((column_lr+1)*3);column++){
           const num = sudokuGrid[row][column];
-          console.log(num);
           if (num !== 0){
             if (seen.has(num)){
-              console.log("Square is invalid");
               return false;
             }
             seen.add(num);
           }
         }
       }
-    console.log("Square is valid");
     return true;
     }
 
     // Check if all the conditions are met
     if (row_valid && column_valid && square_valid){
-      console.log("Sudoku is valid");
       return true;
     }
-    console.log("Sudoku is invalid");
     return false;
   }
 
